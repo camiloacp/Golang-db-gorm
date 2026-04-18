@@ -3,46 +3,40 @@ package storage
 import (
 	"fmt"
 
-	"go-db-gorm/pkg/product"
+	"go-db-gorm/model"
 
 	"gorm.io/gorm"
 )
 
-// GormProduct implements product.Storage using GORM
 type GormProduct struct {
 	db *gorm.DB
 }
 
-// NewGormProduct returns a new pointer of GormProduct
 func NewGormProduct(db *gorm.DB) *GormProduct {
 	return &GormProduct{db: db}
 }
 
-// Create inserts a new product record
-func (g *GormProduct) Create(m *product.Model) error {
+func (g *GormProduct) Create(m *model.Product) error {
 	return g.db.Create(m).Error
 }
 
-// GetAll returns every product in the table
-func (g *GormProduct) GetAll() (product.Models, error) {
-	var ms product.Models
+func (g *GormProduct) GetAll() (model.Products, error) {
+	var ms model.Products
 	if err := g.db.Find(&ms).Error; err != nil {
 		return nil, err
 	}
 	return ms, nil
 }
 
-// GetByID returns a single product by primary key
-func (g *GormProduct) GetByID(id uint) (*product.Model, error) {
-	m := &product.Model{}
+func (g *GormProduct) GetByID(id uint) (*model.Product, error) {
+	m := &model.Product{}
 	if err := g.db.First(m, id).Error; err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// Update saves only the non-zero fields of the given product
-func (g *GormProduct) Update(m *product.Model) error {
+func (g *GormProduct) Update(m *model.Product) error {
 	result := g.db.Model(m).Updates(m)
 	if result.Error != nil {
 		return result.Error
@@ -53,9 +47,8 @@ func (g *GormProduct) Update(m *product.Model) error {
 	return nil
 }
 
-// Delete soft-deletes a product by primary key
 func (g *GormProduct) Delete(id uint) error {
-	result := g.db.Delete(&product.Model{}, id)
+	result := g.db.Delete(&model.Product{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

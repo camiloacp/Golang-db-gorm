@@ -3,9 +3,8 @@ package main
 import (
 	"log"
 
+	"go-db-gorm/model"
 	"go-db-gorm/pkg/invoice"
-	"go-db-gorm/pkg/invoiceheader"
-	"go-db-gorm/pkg/invoiceitem"
 	"go-db-gorm/storage"
 )
 
@@ -23,8 +22,8 @@ func main() {
 	svcInvoice := invoice.NewService(storageInvoice)
 
 	inv := &invoice.Model{
-		Header: &invoiceheader.Model{Client: "Katherine Sanchez"},
-		Items: invoiceitem.Models{
+		Header: &model.InvoiceHeader{Client: "Katherine Sanchez"},
+		Items: model.InvoiceItems{
 			{ProductID: 1},
 			{ProductID: 2},
 			{ProductID: 3},

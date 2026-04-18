@@ -6,9 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"go-db-gorm/pkg/invoiceheader"
-	"go-db-gorm/pkg/invoiceitem"
-	"go-db-gorm/pkg/product"
+	"go-db-gorm/model"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -16,7 +14,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// DBEngine represents the type of database engine to use
 type DBEngine uint8
 
 const (
@@ -36,7 +33,6 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-// New initializes the database connection for the given engine (singleton)
 func New(engine DBEngine) {
 	once.Do(func() {
 		var (
@@ -46,7 +42,6 @@ func New(engine DBEngine) {
 
 		switch engine {
 		case PostgreSQL:
-			// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
 			dsn := fmt.Sprintf(
 				"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
 				getEnv("DB_HOST", "localhost"),
@@ -59,9 +54,6 @@ func New(engine DBEngine) {
 			name = "PostgreSQL"
 
 		case MySQL:
-			// https://gorm.io/docs/connecting_to_the_database.html#MySQL
-			// parseTime=True  → mapea DATETIME/TIMESTAMP a time.Time
-			// loc=Local       → usa la zona horaria local del servidor
 			dsn := fmt.Sprintf(
 				"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 				getEnv("DB_USER", "root"),
@@ -89,16 +81,14 @@ func New(engine DBEngine) {
 	})
 }
 
-// DB returns the singleton *gorm.DB instance
 func DB() *gorm.DB {
 	return db
 }
 
-// Migrate runs AutoMigrate for all models in dependency order
 func Migrate() error {
 	return db.AutoMigrate(
-		&product.Model{},
-		&invoiceheader.Model{},
-		&invoiceitem.Model{},
+		&model.Product{},
+		&model.InvoiceHeader{},
+		&model.InvoiceItem{},
 	)
 }
